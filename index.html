@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KurdCloud - Access Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;700&display=swap');
+        
+        body { 
+            font-family: 'Noto Sans Arabic', sans-serif; 
+            background-color: #050508; 
+            color: #ffffff;
+            overflow: hidden;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-dark {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px;
+            width: 100%;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-dark:focus {
+            border-color: #22c55e;
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+        }
+
+        .secret-admin-trigger {
+            cursor: default;
+            user-select: none;
+        }
+
+        /* Animations */
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header (No Admin Button Visible) -->
+    <nav class="p-8 flex justify-between items-center max-w-7xl mx-auto w-full">
+        <div class="flex items-center gap-4 secret-admin-trigger" ondblclick="triggerSecretAdmin()">
+            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-800 rounded-2xl flex items-center justify-center shadow-2xl">
+                <i class="fas fa-bolt text-white text-xl"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-black leading-none">Kurd<span class="text-green-500">Cloud</span></h1>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Premium Gaming Access</p>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex items-center justify-center p-6 relative">
+        
+        <!-- 1. USER PORTAL (Visible to all) -->
+        <div id="section-user" class="w-full max-w-lg fade-in">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl font-black mb-4">ئەکاونتێ خۆ وەرگرە</h2>
+                <p class="text-gray-400">کۆدێ کڕینێ ل خوارێ بنڤیسە دا زانیاریێن تە دیار ببن</p>
+            </div>
+
+            <div class="glass-card p-10 rounded-[3rem] shadow-2xl">
+                <div id="u-input-area">
+                    <div class="relative mb-6">
+                        <input type="text" id="u-code" placeholder="کۆد لێرە بنڤیسە" 
+                            class="w-full bg-black/60 border border-white/10 rounded-2xl py-6 text-center text-3xl font-mono tracking-[0.2em] outline-none focus:border-green-500 uppercase transition-all">
+                    </div>
+                    
+                    <button onclick="checkUserCode()" class="w-full bg-green-600 hover:bg-green-500 py-5 rounded-2xl font-bold text-xl shadow-lg shadow-green-900/20 active:scale-95 transition-all">
+                        پشکنینا کۆدی
+                    </button>
+                    <p id="u-error" class="text-red-500 text-center mt-4 hidden font-medium">ئەڤ کۆدە یێ دروست نینە!</p>
+                </div>
+
+                <!-- Result Area (Hidden initially) -->
+                <div id="u-result-area" class="hidden">
+                    <div class="flex items-center justify-center mb-8">
+                        <div class="px-6 py-2 bg-green-500/10 border border-green-500/20 rounded-full text-green-400 font-bold text-sm">
+                            <i class="fas fa-check-circle ml-2"></i> <span id="res-brand"></span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-black/40 p-5 rounded-2xl border border-white/5">
+                            <label class="text-[10px] text-gray-500 font-bold uppercase mb-2 block">Username / Email</label>
+                            <div class="flex justify-between items-center">
+                                <span id="res-email" class="font-mono text-lg text-green-400"></span>
+                                <button onclick="copy('res-email')" class="text-gray-500 hover:text-white"><i class="fas fa-copy"></i></button>
+                            </div>
+                        </div>
+                        <div class="bg-black/40 p-5 rounded-2xl border border-white/5">
+                            <label class="text-[10px] text-gray-500 font-bold uppercase mb-2 block">Password</label>
+                            <div class="flex justify-between items-center">
+                                <input type="password" id="res-pass" readonly class="bg-transparent font-mono text-lg text-green-400 outline-none w-full">
+                                <div class="flex gap-4">
+                                    <button onclick="togglePassView()" class="text-gray-500 hover:text-white"><i class="fas fa-eye"></i></button>
+                                    <button onclick="copy('res-pass', true)" class="text-gray-500 hover:text-white"><i class="fas fa-copy"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="location.reload()" class="w-full mt-10 text-gray-500 hover:text-white text-sm font-bold">پشکنینا کۆدەکێ دی</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. SECRET ADMIN LOGIN (Invisible Trigger) -->
+        <div id="section-admin-login" class="hidden w-full max-w-md fade-in">
+            <div class="glass-card p-12 rounded-[3rem] text-center border-red-500/20">
+                <i class="fas fa-user-shield text-4xl text-red-500 mb-6"></i>
+                <h3 class="text-2xl font-bold mb-8">چوونە ژوورا خودانێ سایتێ</h3>
+                <input type="password" id="admin-pass" placeholder="پاسوۆرد" class="input-dark text-center mb-6">
+                <button onclick="verifyAdmin()" class="w-full bg-white text-black py-4 rounded-xl font-bold hover:bg-gray-200 transition">دۆپاتکرن</button>
+                <button onclick="closeAdmin()" class="mt-6 text-gray-500 text-xs">داخستن</button>
+            </div>
+        </div>
+
+        <!-- 3. ADMIN DASHBOARD -->
+        <div id="section-admin-panel" class="hidden w-full max-w-6xl fade-in overflow-y-auto max-h-[85vh]">
+            <div class="flex flex-col lg:flex-row gap-8 pb-10">
+                <!-- Form -->
+                <div class="lg:w-1/3 glass-card p-8 rounded-[2.5rem]">
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <i class="fas fa-plus-circle text-green-500"></i> زێدەکرنا ئەکاونتی
+                    </h3>
+                    <div class="space-y-4">
+                        <input type="text" id="a-code" placeholder="کۆد (m.p: XBOX-55)" class="input-dark uppercase">
+                        <input type="text" id="a-name" placeholder="ناڤێ خزمەتگوزاریێ (m.p: Netflix)" class="input-dark">
+                        <input type="text" id="a-email" placeholder="ئەیمەیل" class="input-dark">
+                        <input type="text" id="a-pass" placeholder="پاسوۆرد" class="input-dark">
+                        <button onclick="addNewAccount()" class="w-full bg-green-600 hover:bg-green-500 py-4 rounded-xl font-bold text-lg mt-2 transition">خەزن بکە</button>
+                    </div>
+                </div>
+                <!-- Table -->
+                <div class="lg:w-2/3 glass-card p-8 rounded-[2.5rem]">
+                    <h3 class="text-xl font-bold mb-6">هەمی ئەکاونتێن تۆمارکری</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-sm">
+                            <thead>
+                                <tr class="text-gray-500 border-b border-white/5">
+                                    <th class="pb-4 px-2">کۆد</th>
+                                    <th class="pb-4 px-2">جۆر</th>
+                                    <th class="pb-4 px-2">ئەیمەیل</th>
+                                    <th class="pb-4 px-2">کردار</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-list-table"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <button onclick="closeAdmin()" class="fixed bottom-10 left-10 bg-red-600 px-8 py-3 rounded-full font-bold shadow-2xl">دەرکەفتنا ئەدمینی</button>
+        </div>
+
+    </main>
+
+    <script>
+        // Secret settings
+        const ADMIN_CODE = "1234"; // <--- Your secret password
+        
+        let database = JSON.parse(localStorage.getItem('kurdcloud_secure_v2')) || [];
+
+        // --- THE SECRET TRIGGER ---
+        // Double-click the LOGO (top left) to open admin
+        function triggerSecretAdmin() {
+            document.getElementById('section-user').classList.add('hidden');
+            document.getElementById('section-admin-login').classList.remove('hidden');
+        }
+
+        function verifyAdmin() {
+            const pass = document.getElementById('admin-pass').value;
+            if(pass === ADMIN_CODE) {
+                document.getElementById('section-admin-login').classList.add('hidden');
+                document.getElementById('section-admin-panel').classList.remove('hidden');
+                document.body.style.overflow = 'auto'; // Allow scrolling in admin
+                renderAdminTable();
+            } else {
+                alert("پاسوۆرد خەلەتە!");
+            }
+        }
+
+        function closeAdmin() {
+            document.getElementById('section-admin-login').classList.add('hidden');
+            document.getElementById('section-admin-panel').classList.add('hidden');
+            document.getElementById('section-user').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('admin-pass').value = '';
+        }
+
+        // --- ADMIN LOGIC ---
+        function addNewAccount() {
+            const code = document.getElementById('a-code').value.trim().toUpperCase();
+            const name = document.getElementById('a-name').value.trim();
+            const email = document.getElementById('a-email').value.trim();
+            const pass = document.getElementById('a-pass').value.trim();
+
+            if(!code || !name || !email || !pass) return alert("هەمی خانەیا پڕ بکە!");
+
+            database.push({ code, name, email, pass });
+            localStorage.setItem('kurdcloud_secure_v2', JSON.stringify(database));
+            renderAdminTable();
+            
+            // Clear fields
+            ['a-code', 'a-name', 'a-email', 'a-pass'].forEach(id => document.getElementById(id).value = '');
+        }
+
+        function deleteAccount(idx) {
+            if(confirm("رەش بکەم؟")) {
+                database.splice(idx, 1);
+                localStorage.setItem('kurdcloud_secure_v2', JSON.stringify(database));
+                renderAdminTable();
+            }
+        }
+
+        function renderAdminTable() {
+            const table = document.getElementById('admin-list-table');
+            table.innerHTML = database.map((acc, i) => `
+                <tr class="border-b border-white/5 hover:bg-white/5 transition">
+                    <td class="py-4 px-2 font-mono text-green-500">${acc.code}</td>
+                    <td class="py-4 px-2 font-bold">${acc.name}</td>
+                    <td class="py-4 px-2 text-gray-400 font-mono text-xs">${acc.email}</td>
+                    <td class="py-4 px-2 text-left">
+                        <button onclick="deleteAccount(${i})" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // --- USER LOGIC ---
+        function checkUserCode() {
+            const code = document.getElementById('u-code').value.trim().toUpperCase();
+            const found = database.find(a => a.code === code);
+            const err = document.getElementById('u-error');
+
+            if(found) {
+                document.getElementById('res-brand').innerText = found.name;
+                document.getElementById('res-email').innerText = found.email;
+                document.getElementById('res-pass').value = found.pass;
+                
+                document.getElementById('u-input-area').classList.add('hidden');
+                document.getElementById('u-result-area').classList.remove('hidden');
+                err.classList.add('hidden');
+            } else {
+                err.classList.remove('hidden');
+            }
+        }
+
+        function togglePassView() {
+            const p = document.getElementById('res-pass');
+            p.type = p.type === "password" ? "text" : "password";
+        }
+
+        function copy(id, isInput = false) {
+            const el = document.getElementById(id);
+            const val = isInput ? el.value : el.innerText;
+            navigator.clipboard.writeText(val).then(() => alert("کۆپی بوو!"));
+        }
+    </script>
+</body>
+</html>
+
